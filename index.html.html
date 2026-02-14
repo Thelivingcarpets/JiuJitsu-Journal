@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#09090b">
+<title>Mat Notes — BJJ Training Journal</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090b;--surface:#18181b;--surface2:#27272a;--surface3:#3f3f46;
+  --text:#e4e4e7;--text2:#a1a1aa;--text3:#71717a;--text4:#52525b;
+  --amber:#d97706;--amber-l:#f59e0b;--amber-d:#92400e;
+  --emerald:#059669;--emerald-bg:rgba(5,150,105,.15);
+  --red:#dc2626;--red-bg:rgba(220,38,38,.15);
+  --blue:#2563eb;--blue-bg:rgba(37,99,235,.15);
+  --purple:#7c3aed;--purple-bg:rgba(124,58,237,.15);
+  --radius:12px;--radius-sm:8px;
+}
+html{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);font-size:14px;-webkit-tap-highlight-color:transparent}
+body{min-height:100dvh;padding-bottom:env(safe-area-inset-bottom,20px)}
+button,input,select,textarea{font:inherit;color:inherit;border:none;background:none;outline:none}
+button{cursor:pointer;-webkit-user-select:none;user-select:none}
+input,select,textarea{-webkit-appearance:none}
+
+.container{max-width:480px;margin:0 auto;padding:0 16px}
+
+/* Header */
+.header{position:sticky;top:0;z-index:50;background:rgba(9,9,11,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--surface2);padding:16px 0}
+.header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.logo{font-family:Georgia,serif;font-size:18px;font-weight:700;letter-spacing:-.3px}
+.logo-sub{font-size:11px;color:var(--text4);margin-top:1px}
+.belt-mini{height:14px;width:56px;border-radius:3px;display:inline-flex;align-items:center;justify-content:flex-end;padding-right:3px;gap:2px;vertical-align:middle;margin-left:10px}
+.belt-mini .stripe{width:3px;height:9px;background:rgba(0,0,0,.7);border-radius:1px}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;background:var(--surface);border-radius:var(--radius-sm);padding:3px}
+.tab{flex:1;padding:7px 0;border-radius:6px;font-size:12px;font-weight:500;color:var(--text3);text-align:center;transition:all .2s}
+.tab.active{background:var(--surface2);color:var(--text)}
+
+/* Buttons */
+.btn{padding:10px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;transition:all .15s}
+.btn-primary{background:var(--amber);color:#fff}
+.btn-primary:active{background:var(--amber-l)}
+.btn-primary:disabled{opacity:.3}
+.btn-secondary{background:var(--surface2);color:var(--text2);border:1px solid var(--surface3)}
+.btn-sm{padding:7px 12px;font-size:12px}
+.btn-block{display:block;width:100%}
+
+/* Cards */
+.card{background:var(--surface);border:1px solid var(--surface2);border-radius:var(--radius);padding:20px;margin-bottom:12px}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.card-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px}
+.card-action{font-size:12px;color:var(--amber);font-weight:500}
+
+/* Form elements */
+.field{margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+.label{display:block;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.input{width:100%;background:var(--surface2);border:1px solid var(--surface3);border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;color:var(--text);transition:border-color .15s}
+.input:focus{border-color:var(--amber)}
+.input::placeholder{color:var(--text4)}
+textarea.input{resize:none;min-height:100px}
+select.input{cursor:pointer}
+
+/* Toggle buttons */
+.toggle-row{display:flex;gap:6px}
+.toggle-btn{flex:1;padding:9px 4px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;text-align:center;border:1px solid var(--surface3);color:var(--text3);transition:all .15s}
+.toggle-btn.active{border-color:var(--amber);background:var(--amber);color:#fff}
+.toggle-btn.active-white{border-color:var(--text);background:var(--text);color:var(--bg)}
+.toggle-btn.active-green{border-color:var(--emerald);background:var(--emerald);color:#fff}
+.toggle-btn.active-red{border-color:var(--red);background:var(--red);color:#fff}
+
+/* Tags */
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500}
+.tag-zinc{background:var(--surface2);color:var(--text2)}
+.tag-amber{background:rgba(217,119,6,.15);color:#fbbf24}
+.tag-blue{background:var(--blue-bg);color:#60a5fa}
+.tag-emerald{background:var(--emerald-bg);color:#34d399}
+.tag-red{background:var(--red-bg);color:#f87171}
+.tag-purple{background:var(--purple-bg);color:#a78bfa}
+
+/* Energy bar */
+.energy{display:flex;gap:4px;align-items:center}
+.energy-dot{width:24px;height:24px;border-radius:6px;background:var(--surface3);transition:all .2s;cursor:pointer}
+.energy-dot.on-low{background:var(--red)}
+.energy-dot.on-mid{background:var(--amber)}
+.energy-dot.on-high{background:var(--emerald)}
+.energy-label{font-size:11px;color:var(--text3);margin-left:8px}
+
+/* Checklist */
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:4px 0}
+.checkbox{width:20px;height:20px;border-radius:6px;border:2px solid var(--surface3);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-top:1px;cursor:pointer}
+.checkbox.checked{background:var(--amber);border-color:var(--amber)}
+.checkbox.checked-green{background:rgba(5,150,105,.3);border-color:var(--emerald)}
+.checkbox svg{width:12px;height:12px;stroke:#fff;stroke-width:3;fill:none}
+.check-text{font-size:13px;color:var(--text);flex:1}
+.check-text.done{color:var(--text4);text-decoration:line-through}
+.check-remove{font-size:16px;color:var(--text4);padding:0 4px;opacity:0;transition:opacity .15s}
+.check-item:hover .check-remove,.check-item:active .check-remove{opacity:1}
+
+/* Work-on items */
+.work-item{display:flex;align-items:flex-start;gap:12px;background:rgba(39,39,42,.5);border-radius:var(--radius-sm);padding:12px}
+.work-item+.work-item{margin-top:8px}
+.work-meta{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:2px}
+.work-date{font-size:11px;color:var(--text4);margin-top:4px}
+
+/* Entry cards */
+.entry{background:var(--surface);border:1px solid var(--surface2);border-radius:var(--radius);overflow:hidden;margin-bottom:10px;transition:border-color .15s}
+.entry:hover{border-color:var(--surface3)}
+.entry-head{padding:16px;display:flex;justify-content:space-between;align-items:flex-start;cursor:pointer;-webkit-user-select:none;user-select:none}
+.entry-date{font-size:13px;font-weight:600;color:var(--text)}
+.entry-summary{font-size:11px;color:var(--text3);margin-top:4px;display:flex;gap:8px}
+.entry-body{padding:0 16px 16px;border-top:1px solid var(--surface2);padding-top:16px}
+.entry-section{margin-bottom:14px}
+.entry-section:last-child{margin-bottom:0}
+.entry-section-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.entry-tech,.entry-roll{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:4px 0}
+.entry-tech span,.entry-roll span{font-size:13px;color:var(--text2)}
+.entry-note-text{font-size:13px;color:var(--text2);line-height:1.5}
+.entry-delete{font-size:12px;color:var(--text4);margin-top:12px;padding:4px 0}
+
+/* Form tabs */
+.form-tabs{display:flex;border-bottom:1px solid var(--surface3)}
+.form-tab{flex:1;padding:12px 0;font-size:13px;font-weight:500;color:var(--text3);text-align:center;transition:all .15s;border-bottom:2px solid transparent}
+.form-tab.active{color:var(--amber);border-bottom-color:var(--amber);background:rgba(39,39,42,.5)}
+
+/* Tech/roll list in form */
+.mini-card{display:flex;justify-content:space-between;align-items:flex-start;background:var(--surface2);border-radius:var(--radius-sm);padding:12px;margin-bottom:6px}
+.mini-card-tags{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.mini-card-name{font-size:13px;font-weight:500;color:var(--text)}
+.mini-card-note{font-size:11px;color:var(--text3);margin-top:3px}
+.mini-card-remove{font-size:18px;color:var(--text4);padding:0 2px;line-height:1}
+
+/* Progress bar */
+.progress-track{height:6px;width:96px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:var(--amber);border-radius:3px;transition:width .5s}
+
+/* Stats grid */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.stat-num{font-size:24px;font-weight:700;color:var(--text)}
+.stat-num.accent{color:var(--amber-l)}
+.stat-label{font-size:11px;color:var(--text3)}
+.stat-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+
+/* Belt editor */
+.belt-row{display:flex;gap:6px}
+.belt-opt{flex:1;padding:10px 4px;border-radius:var(--radius-sm);font-size:11px;font-weight:600;text-align:center;border:1px solid var(--surface3);color:var(--text3);transition:all .15s}
+.belt-opt.sel{outline:2px solid var(--amber);outline-offset:1px}
+
+/* Belt display */
+.belt-display{display:flex;align-items:center;gap:10px}
+.belt-bar{height:20px;width:80px;border-radius:3px;display:flex;align-items:center;justify-content:flex-end;padding-right:4px;gap:2px}
+.belt-bar .stripe{width:4px;height:12px;background:rgba(0,0,0,.7);border-radius:1px}
+
+/* Utility */
+.hidden{display:none!important}
+.mt-8{margin-top:8px}
+.mt-12{margin-top:12px}
+.mt-16{margin-top:16px}
+.mb-6{margin-bottom:6px}
+.gap-8{gap:8px}
+.flex{display:flex}
+.flex-1{flex:1}
+.items-center{align-items:center}
+.justify-between{justify-content:space-between}
+.text-center{text-align:center}
+.empty{padding:60px 0;text-align:center}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.empty-title{font-size:16px;font-weight:600;color:var(--text2);margin-bottom:4px}
+.empty-desc{font-size:13px;color:var(--text4);margin-bottom:24px}
+.chevron{width:16px;height:16px;stroke:var(--text3);stroke-width:2;fill:none;transition:transform .2s}
+.chevron.open{transform:rotate(180deg)}
+.add-form{background:rgba(39,39,42,.5);border:1px solid var(--surface3);border-radius:var(--radius-sm);padding:16px;margin-top:12px}
+.add-row{display:flex;gap:8px;margin-top:12px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.form-actions{display:flex;gap:10px;padding:20px;padding-top:0}
+.form-actions .btn{flex:1}
+.inline-tags{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.stripe-row{display:flex;gap:8px}
+.stripe-btn{width:40px;padding:10px 0;text-align:center;border-radius:var(--radius-sm);font-size:13px;font-weight:500;border:1px solid var(--surface3);color:var(--text3)}
+.stripe-btn.sel{background:var(--amber);border-color:var(--amber);color:#fff}
+.resolved-title{font-size:11px;color:var(--text4);margin-top:16px;margin-bottom:8px}
+
+@media(max-width:380px){
+  .toggle-row{flex-wrap:wrap}
+  .toggle-btn{min-width:calc(33% - 4px)}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(function(){
+"use strict";
+
+// ── State ──
+let state = {
+  entries: [],
+  belt: { belt:"Blue", stripes:1, startDate:"2023-02-01", lastPromo:"", notes:"" },
+  goals: {},
+  workOn: [],
+  view: "journal",
+  showForm: false,
+  formTab: "details",
+  formEntry: null,
+  editingBelt: false,
+  beltForm: null,
+  addingGoal: false,
+  addingWorkOn: false,
+  expandedEntry: null,
+};
+
+// ── Persistence ──
+function loadState() {
+  try {
+    const raw = localStorage.getItem("bjj-mat-notes");
+    if (raw) {
+      const d = JSON.parse(raw);
+      if (d.entries) state.entries = d.entries;
+      if (d.belt) state.belt = d.belt;
+      if (d.goals) state.goals = d.goals;
+      if (d.workOn) state.workOn = d.workOn;
+    }
+  } catch(e) {}
+}
+
+function saveState() {
+  try {
+    localStorage.setItem("bjj-mat-notes", JSON.stringify({
+      entries: state.entries, belt: state.belt, goals: state.goals, workOn: state.workOn
+    }));
+  } catch(e) {}
+}
+
+// ── Helpers ──
+const uid = () => Date.now().toString(36)+Math.random().toString(36).substr(2,5);
+const POSITIONS = ["Guard","Half Guard","Mount","Side Control","Back","Standing","Turtle","Other"];
+const TECH_TYPES = ["Sweep","Submission","Pass","Escape","Takedown","Defense","Transition","Other"];
+const SORENESS = ["None","Mild","Moderate","Heavy","Brutal"];
+const BELTS = [{name:"White",bg:"#fff",stripes:4},{name:"Blue",bg:"#2563eb",stripes:4},{name:"Purple",bg:"#7c3aed",stripes:4},{name:"Brown",bg:"#92400e",stripes:4},{name:"Black",bg:"#27272a",stripes:6}];
+const RESULTS = ["Dominant","Subbed them","Mixed","Competitive","Got subbed","Got smashed"];
+
+function fmtDate(d){return new Date(d).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short",year:"numeric"});}
+function ago(d){const diff=Math.floor((Date.now()-new Date(d))/(864e5));return diff===0?"Today":diff===1?"Yesterday":diff+"d ago";}
+function weekKey(){const d=new Date(),day=d.getDay(),diff=d.getDate()-day+(day===0?-6:1);d.setDate(diff);return d.toISOString().split("T")[0];}
+function energyLabel(l){return l<=2?"Low":l<=3?"OK":l===4?"Good":"Peak";}
+function energyClass(l,i){if(i>l)return"";return l<=2?"on-low":l<=3?"on-mid":"on-high";}
+function resultColor(r){return(r==="Dominant"||r==="Subbed them")?"emerald":(r==="Got subbed"||r==="Got smashed")?"red":"zinc";}
+function classColor(c){return c==="No-Gi"?"purple":c==="Open Mat"?"emerald":"amber";}
+function beltBg(name){return(BELTS.find(b=>b.name===name)||BELTS[1]).bg;}
+function beltStripeMax(name){return(BELTS.find(b=>b.name===name)||BELTS[1]).stripes;}
+
+function freshEntry(){
+  return {id:uid(),date:new Date().toISOString().split("T")[0],classType:"Gi",energy:3,soreness:"None",injuries:"",techniques:[],rolls:[],notes:""};
+}
+
+// ── Render Engine ──
+const $ = sel => document.querySelector(sel);
+const $$ = sel => document.querySelectorAll(sel);
+
+function h(tag, attrs, ...children) {
+  const el = document.createElement(tag);
+  if (attrs) Object.entries(attrs).forEach(([k,v]) => {
+    if (k === "className") el.className = v;
+    else if (k === "style" && typeof v === "object") Object.assign(el.style, v);
+    else if (k.startsWith("on")) el.addEventListener(k.slice(2).toLowerCase(), v);
+    else el.setAttribute(k, v);
+  });
+  children.flat(Infinity).forEach(c => {
+    if (c == null || c === false) return;
+    el.appendChild(typeof c === "string" || typeof c === "number" ? document.createTextNode(c) : c);
+  });
+  return el;
+}
+
+function tag(label, color) {
+  return h("span", {className: `tag tag-${color||"zinc"}`}, label);
+}
+
+function chevronSvg(open) {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+  svg.setAttribute("viewBox","0 0 24 24");
+  svg.setAttribute("class","chevron"+(open?" open":""));
+  const path = document.createElementNS("http://www.w3.org/2000/svg","path");
+  path.setAttribute("d","M19 9l-7 7-7-7");
+  path.setAttribute("stroke-linecap","round");
+  path.setAttribute("stroke-linejoin","round");
+  svg.appendChild(path);
+  return svg;
+}
+
+function checkSvg() {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+  svg.setAttribute("viewBox","0 0 24 24");
+  const path = document.createElementNS("http://www.w3.org/2000/svg","path");
+  path.setAttribute("d","M5 13l4 4L19 7");
+  path.setAttribute("stroke-linecap","round");
+  path.setAttribute("stroke-linejoin","round");
+  svg.appendChild(path);
+  return svg;
+}
+
+// ── Components ──
+
+function renderEnergyBar(level, onChange) {
+  const dots = [1,2,3,4,5].map(i => {
+    const dot = h("div", {className: `energy-dot ${energyClass(level,i)}`});
+    if (onChange) dot.addEventListener("click", () => { onChange(i); });
+    else dot.style.cursor = "default";
+    return dot;
+  });
+  return h("div", {className:"energy"}, ...dots, h("span",{className:"energy-label"},energyLabel(level)));
+}
+
+function renderBeltMini() {
+  const bar = h("span", {className:"belt-mini", style:{background:beltBg(state.belt.belt), border: state.belt.belt==="Black"?"1px solid #52525b":"none"}});
+  for(let i=0;i<state.belt.stripes;i++) bar.appendChild(h("span",{className:"stripe"}));
+  return bar;
+}
+
+function renderBeltDisplay(belt, stripes) {
+  const bar = h("div",{className:"belt-bar",style:{background:beltBg(belt), border: belt==="Black"?"1px solid #52525b":"none"}});
+  for(let i=0;i<stripes;i++) bar.appendChild(h("span",{className:"stripe"}));
+  return h("div",{className:"belt-display"}, bar, h("span",{style:{fontSize:"12px",color:"#a1a1aa"}}, belt+" · "+stripes+" stripe"+(stripes!==1?"s":"")));
+}
+
+// ── Page Renders ──
+
+function renderHeader() {
+  const left = h("div",{className:"flex items-center gap-8"},
+    h("div",{},
+      h("div",{className:"logo"},"Mat Notes", renderBeltMini()),
+      h("div",{className:"logo-sub"},"BJJ Training Journal")
+    )
+  );
+
+  const logBtn = state.showForm ? null : h("button",{className:"btn btn-primary btn-sm",onClick:()=>{state.showForm=true;state.formEntry=freshEntry();state.formTab="details";render();}},
+    "+ Log"
+  );
+
+  const tabs = state.showForm ? null : h("div",{className:"tabs"},
+    ...["journal","goals","stats"].map(v =>
+      h("button",{className:`tab ${state.view===v?"active":""}`,onClick:()=>{state.view=v;render();}}, v.charAt(0).toUpperCase()+v.slice(1))
+    )
+  );
+
+  return h("div",{className:"header"}, h("div",{className:"container"},
+    h("div",{className:"header-row"}, left, logBtn),
+    tabs
+  ));
+}
+
+function renderJournal() {
+  if (state.entries.length === 0) {
+    return h("div",{className:"empty"},
+      h("div",{className:"empty-icon"},"🥋"),
+      h("div",{className:"empty-title"},"No sessions logged yet"),
+      h("div",{className:"empty-desc"},"Start tracking your training to see patterns and progress"),
+      h("button",{className:"btn btn-primary",onClick:()=>{state.showForm=true;state.formEntry=freshEntry();state.formTab="details";render();}},"Log Your First Session")
+    );
+  }
+  const frag = document.createDocumentFragment();
+  state.entries.forEach(e => frag.appendChild(renderEntryCard(e)));
+  return frag;
+}
+
+function renderEntryCard(entry) {
+  const isOpen = state.expandedEntry === entry.id;
+  const card = h("div",{className:"entry"});
+
+  const head = h("div",{className:"entry-head", onClick:()=>{state.expandedEntry=isOpen?null:entry.id;render();}},
+    h("div",{},
+      h("div",{className:"flex items-center gap-8"}, h("span",{className:"entry-date"},fmtDate(entry.date)), tag(entry.classType, classColor(entry.classType))),
+      h("div",{className:"entry-summary"},
+        h("span",{},entry.techniques.length+" tech"),
+        h("span",{},"·"),
+        h("span",{},entry.rolls.length+" roll"+(entry.rolls.length!==1?"s":"")),
+        h("span",{},"·"),
+        h("span",{},ago(entry.date))
+      )
+    ),
+    h("div",{className:"flex items-center gap-8"},
+      renderEnergyBar(entry.energy),
+      chevronSvg(isOpen)
+    )
+  );
+  card.appendChild(head);
+
+  if (isOpen) {
+    const body = h("div",{className:"entry-body"});
+
+    if (entry.soreness!=="None" || entry.injuries) {
+      const meta = h("div",{style:{fontSize:"12px",display:"flex",gap:"16px",flexWrap:"wrap",marginBottom:"14px"}});
+      if(entry.soreness!=="None") meta.appendChild(h("span",{style:{color:"#a1a1aa"}},"Soreness: ", h("span",{style:{color:"#e4e4e7"}},entry.soreness)));
+      if(entry.injuries) meta.appendChild(h("span",{style:{color:"#a1a1aa"}},"Injuries: ", h("span",{style:{color:"#f87171"}},entry.injuries)));
+      body.appendChild(meta);
+    }
+
+    if (entry.techniques.length > 0) {
+      const sec = h("div",{className:"entry-section"}, h("div",{className:"entry-section-title"},"Techniques"));
+      entry.techniques.forEach(t => {
+        const row = h("div",{className:"entry-tech"}, h("span",{},t.name), tag(t.type,"amber"), tag(t.position,"blue"));
+        if(t.notes) row.appendChild(h("span",{style:{fontSize:"11px",color:"#52525b",fontStyle:"italic"}},"— "+t.notes));
+        sec.appendChild(row);
+      });
+      body.appendChild(sec);
+    }
+
+    if (entry.rolls.length > 0) {
+      const sec = h("div",{className:"entry-section"}, h("div",{className:"entry-section-title"},"Rolls"));
+      entry.rolls.forEach(r => {
+        const row = h("div",{className:"entry-roll"}, h("span",{},r.partner), tag(r.result,resultColor(r.result)));
+        if(r.notes) row.appendChild(h("span",{style:{fontSize:"11px",color:"#52525b",fontStyle:"italic"}},"— "+r.notes));
+        sec.appendChild(row);
+      });
+      body.appendChild(sec);
+    }
+
+    if (entry.notes) {
+      body.appendChild(h("div",{className:"entry-section"}, h("div",{className:"entry-section-title"},"Notes"), h("p",{className:"entry-note-text"},entry.notes)));
+    }
+
+    body.appendChild(h("button",{className:"entry-delete",onClick:(ev)=>{ev.stopPropagation();state.entries=state.entries.filter(x=>x.id!==entry.id);state.expandedEntry=null;saveState();render();}}, "Delete entry"));
+    card.appendChild(body);
+  }
+  return card;
+}
+
+function renderForm() {
+  const e = state.formEntry;
+  const wrap = h("div",{className:"card",style:{padding:0,overflow:"hidden"}});
+
+  // Tabs
+  const tabRow = h("div",{className:"form-tabs"});
+  [{k:"details",l:"Session"},{k:"techniques",l:"Tech ("+e.techniques.length+")"},{k:"rolls",l:"Rolls ("+e.rolls.length+")"},{k:"notes",l:"Notes"}].forEach(t => {
+    tabRow.appendChild(h("button",{className:`form-tab ${state.formTab===t.k?"active":""}`,onClick:()=>{state.formTab=t.k;render();}},t.l));
+  });
+  wrap.appendChild(tabRow);
+
+  const body = h("div",{style:{padding:"20px"}});
+
+  if (state.formTab === "details") {
+    body.appendChild(h("div",{className:"grid-2"},
+      h("div",{className:"field"}, h("label",{className:"label"},"Date"), h("input",{className:"input",type:"date",value:e.date,onInput:ev=>{e.date=ev.target.value;}})),
+      h("div",{className:"field"}, h("label",{className:"label"},"Class Type"),
+        h("div",{className:"toggle-row"}, ...["Gi","No-Gi","Open Mat"].map(t =>
+          h("button",{className:`toggle-btn ${e.classType===t?"active":""}`,onClick:()=>{e.classType=t;render();}},t)
+        ))
+      )
+    ));
+    body.appendChild(h("div",{className:"field"}, h("label",{className:"label"},"Energy"), renderEnergyBar(e.energy, l=>{e.energy=l;render();})));
+    body.appendChild(h("div",{className:"field"}, h("label",{className:"label"},"Soreness"),
+      h("div",{className:"toggle-row"}, ...SORENESS.map(s =>
+        h("button",{className:`toggle-btn ${e.soreness===s?"active-white":""}`,onClick:()=>{e.soreness=s;render();}},s)
+      ))
+    ));
+    body.appendChild(h("div",{className:"field"}, h("label",{className:"label"},"Injuries / Niggles"),
+      h("input",{className:"input",placeholder:"e.g. Left knee twinge",value:e.injuries,onInput:ev=>{e.injuries=ev.target.value;}})
+    ));
+  }
+
+  if (state.formTab === "techniques") {
+    e.techniques.forEach(t => {
+      body.appendChild(h("div",{className:"mini-card"},
+        h("div",{}, h("div",{className:"mini-card-tags"}, h("span",{className:"mini-card-name"},t.name), tag(t.type,"amber"), tag(t.position,"blue")),
+          t.notes ? h("div",{className:"mini-card-note"},t.notes) : null),
+        h("button",{className:"mini-card-remove",onClick:()=>{e.techniques=e.techniques.filter(x=>x.id!==t.id);render();}},"×")
+      ));
+    });
+
+    const addDiv = h("div",{className:"add-form"});
+    let tName="",tType="Sweep",tPos="Guard",tNotes="";
+    const nameInp = h("input",{className:"input",placeholder:"Technique name (e.g. Scissor sweep)",onInput:ev=>{tName=ev.target.value;}});
+    nameInp.addEventListener("keydown",ev=>{if(ev.key==="Enter")doAdd();});
+    addDiv.appendChild(nameInp);
+    addDiv.appendChild(h("div",{className:"grid-2",style:{marginTop:"12px"}},
+      h("div",{}, h("label",{className:"label"},"Type"),
+        (() => { const sel = h("select",{className:"input",onInput:ev=>{tType=ev.target.value;}}); TECH_TYPES.forEach(t=>{sel.appendChild(h("option",{value:t},t));}); return sel; })()),
+      h("div",{}, h("label",{className:"label"},"Position"),
+        (() => { const sel = h("select",{className:"input",onInput:ev=>{tPos=ev.target.value;}}); POSITIONS.forEach(p=>{sel.appendChild(h("option",{value:p},p));}); return sel; })())
+    ));
+    const noteInp = h("input",{className:"input",style:{marginTop:"12px"},placeholder:"Quick note (optional)",onInput:ev=>{tNotes=ev.target.value;}});
+    addDiv.appendChild(noteInp);
+
+    function doAdd(){if(!tName.trim())return;e.techniques.push({id:uid(),name:tName.trim(),type:tType,position:tPos,notes:tNotes});render();}
+    addDiv.appendChild(h("button",{className:"btn btn-primary btn-block",style:{marginTop:"12px"},onClick:doAdd},"+ Add Technique"));
+    body.appendChild(addDiv);
+  }
+
+  if (state.formTab === "rolls") {
+    e.rolls.forEach(r => {
+      body.appendChild(h("div",{className:"mini-card"},
+        h("div",{}, h("div",{className:"mini-card-tags"}, h("span",{className:"mini-card-name"},r.partner), tag(r.result,resultColor(r.result))),
+          r.notes ? h("div",{className:"mini-card-note"},r.notes) : null),
+        h("button",{className:"mini-card-remove",onClick:()=>{e.rolls=e.rolls.filter(x=>x.id!==r.id);render();}},"×")
+      ));
+    });
+
+    const addDiv = h("div",{className:"add-form"});
+    let rPartner="",rResult="Mixed",rNotes="";
+    const pInp = h("input",{className:"input",placeholder:"Training partner name",onInput:ev=>{rPartner=ev.target.value;}});
+    pInp.addEventListener("keydown",ev=>{if(ev.key==="Enter")doAddR();});
+    addDiv.appendChild(pInp);
+    addDiv.appendChild(h("div",{style:{marginTop:"12px"}}, h("label",{className:"label"},"How did it go?"),
+      h("div",{className:"grid-3"}, ...RESULTS.map(r => {
+        const cls = rResult===r ? (r==="Dominant"||r==="Subbed them"?"active-green":r==="Got subbed"||r==="Got smashed"?"active-red":"active-white") : "";
+        return h("button",{className:`toggle-btn ${cls}`,onClick:()=>{rResult=r;render();}},r);
+      }))
+    ));
+    const nInp = h("input",{className:"input",style:{marginTop:"12px"},placeholder:"What worked / caught you?",onInput:ev=>{rNotes=ev.target.value;}});
+    addDiv.appendChild(nInp);
+
+    function doAddR(){if(!rPartner.trim())return;e.rolls.push({id:uid(),partner:rPartner.trim(),result:rResult,notes:rNotes});render();}
+    addDiv.appendChild(h("button",{className:"btn btn-primary btn-block",style:{marginTop:"12px"},onClick:doAddR},"+ Add Roll"));
+    body.appendChild(addDiv);
+  }
+
+  if (state.formTab === "notes") {
+    body.appendChild(h("div",{className:"field"}, h("label",{className:"label"},"Session Notes"),
+      h("textarea",{className:"input",placeholder:"Key takeaways, things to work on, questions for coach...",onInput:ev=>{e.notes=ev.target.value;}},e.notes)
+    ));
+  }
+
+  wrap.appendChild(body);
+  wrap.appendChild(h("div",{className:"form-actions"},
+    h("button",{className:"btn btn-secondary",onClick:()=>{state.showForm=false;render();}},"Cancel"),
+    h("button",{className:"btn btn-primary",onClick:()=>{
+      state.entries.unshift(e);
+      state.entries.sort((a,b)=>new Date(b.date)-new Date(a.date));
+      state.showForm=false;
+      saveState();render();
+    }},"Save Session")
+  ));
+  return wrap;
+}
+
+function renderGoals() {
+  const frag = document.createDocumentFragment();
+
+  // Weekly Goals
+  const wk = weekKey();
+  const list = state.goals[wk] || [];
+  const done = list.filter(g=>g.done).length;
+
+  const goalsCard = h("div",{className:"card"});
+  const gHead = h("div",{className:"card-header"},
+    h("div",{},
+      h("div",{className:"card-title"},"This Week's Goals"),
+      list.length > 0 ? h("div",{className:"flex items-center gap-8",style:{marginTop:"6px"}},
+        h("div",{className:"progress-track"}, h("div",{className:"progress-fill",style:{width:(done/list.length*100)+"%"}})),
+        h("span",{style:{fontSize:"11px",color:"#71717a"}},done+"/"+list.length)
+      ) : null
+    ),
+    !state.addingGoal ? h("button",{className:"card-action",onClick:()=>{state.addingGoal=true;render();}},"+ Add") : null
+  );
+  goalsCard.appendChild(gHead);
+
+  if (list.length===0 && !state.addingGoal) {
+    goalsCard.appendChild(h("p",{style:{fontSize:"13px",color:"#52525b",padding:"8px 0"}},"No goals this week yet."));
+  }
+
+  list.forEach(g => {
+    const item = h("div",{className:"check-item"},
+      h("div",{className:`checkbox ${g.done?"checked":""}`,onClick:()=>{g.done=!g.done;saveState();render();}}, g.done?checkSvg():null),
+      h("span",{className:`check-text ${g.done?"done":""}`},g.text),
+      h("button",{className:"check-remove",onClick:()=>{state.goals[wk]=list.filter(x=>x.id!==g.id);saveState();render();}},"×")
+    );
+    goalsCard.appendChild(item);
+  });
+
+  if (state.addingGoal) {
+    let val="";
+    const inp = h("input",{className:"input",placeholder:"e.g. Hit 3 scissor sweeps in rolls",onInput:ev=>{val=ev.target.value;},autofocus:"true"});
+    inp.addEventListener("keydown",ev=>{if(ev.key==="Enter"&&val.trim()){if(!state.goals[wk])state.goals[wk]=[];state.goals[wk].push({id:uid(),text:val.trim(),done:false});state.addingGoal=false;saveState();render();}});
+    goalsCard.appendChild(h("div",{className:"add-row"},
+      inp,
+      h("button",{className:"btn btn-primary btn-sm",onClick:()=>{if(!val.trim())return;if(!state.goals[wk])state.goals[wk]=[];state.goals[wk].push({id:uid(),text:val.trim(),done:false});state.addingGoal=false;saveState();render();}},"Add"),
+      h("button",{className:"btn btn-secondary btn-sm",onClick:()=>{state.addingGoal=false;render();}},"×")
+    ));
+  }
+  frag.appendChild(goalsCard);
+
+  // Work On
+  const woCard = h("div",{className:"card"});
+  woCard.appendChild(h("div",{className:"card-header"},
+    h("div",{className:"card-title"},"Things to Work On"),
+    !state.addingWorkOn ? h("button",{className:"card-action",onClick:()=>{state.addingWorkOn=true;render();}},"+Add") : null
+  ));
+
+  const active = state.workOn.filter(i=>!i.resolved).sort((a,b)=>({High:0,Medium:1,Low:2})[a.priority]-({High:0,Medium:1,Low:2})[b.priority]);
+  const resolved = state.workOn.filter(i=>i.resolved);
+
+  if (active.length===0 && !state.addingWorkOn) {
+    woCard.appendChild(h("p",{style:{fontSize:"13px",color:"#52525b",padding:"8px 0"}},"Nothing here yet. Add areas to improve."));
+  }
+
+  active.forEach(item => {
+    const el = h("div",{className:"work-item"},
+      h("div",{className:"checkbox",style:{marginTop:"2px"},onClick:()=>{item.resolved=true;saveState();render();}}),
+      h("div",{style:{flex:1,minWidth:0}},
+        h("div",{className:"work-meta"}, h("span",{style:{fontSize:"13px",color:"#e4e4e7"}},item.text), tag(item.position,"blue"), tag(item.priority,item.priority==="High"?"red":item.priority==="Medium"?"amber":"zinc")),
+        h("div",{className:"work-date"},"Added "+ago(item.createdAt))
+      ),
+      h("button",{className:"check-remove",style:{opacity:1,fontSize:"14px"},onClick:()=>{state.workOn=state.workOn.filter(x=>x.id!==item.id);saveState();render();}},"×")
+    );
+    woCard.appendChild(el);
+  });
+
+  if (resolved.length>0) {
+    woCard.appendChild(h("div",{className:"resolved-title"},"Resolved ("+resolved.length+")"));
+    resolved.slice(0,5).forEach(item => {
+      woCard.appendChild(h("div",{className:"check-item"},
+        h("div",{className:"checkbox checked-green",onClick:()=>{item.resolved=false;saveState();render();}}, checkSvg()),
+        h("span",{className:"check-text done"},item.text),
+        h("button",{className:"check-remove",onClick:()=>{state.workOn=state.workOn.filter(x=>x.id!==item.id);saveState();render();}},"×")
+      ));
+    });
+  }
+
+  if (state.addingWorkOn) {
+    let wText="",wPos="Guard",wPri="Medium";
+    const addF = h("div",{className:"add-form"});
+    const tInp = h("input",{className:"input",placeholder:"e.g. Getting stuck in bottom side control",onInput:ev=>{wText=ev.target.value;},autofocus:"true"});
+    tInp.addEventListener("keydown",ev=>{if(ev.key==="Enter")doAddW();});
+    addF.appendChild(tInp);
+    addF.appendChild(h("div",{className:"grid-2",style:{marginTop:"12px"}},
+      h("div",{}, h("label",{className:"label"},"Position"),
+        (()=>{const s=h("select",{className:"input",onInput:ev=>{wPos=ev.target.value;}});POSITIONS.forEach(p=>{s.appendChild(h("option",{value:p},p));});return s;})()),
+      h("div",{}, h("label",{className:"label"},"Priority"),
+        h("div",{className:"toggle-row",style:{gap:"4px"}},
+          ...["High","Medium","Low"].map(p=>h("button",{className:`toggle-btn ${wPri===p?(p==="High"?"active-red":p==="Medium"?"active":""):""}`,style:{fontSize:"11px"},onClick:()=>{wPri=p;render();}},p))
+        ))
+    ));
+
+    function doAddW(){if(!wText.trim())return;state.workOn.push({id:uid(),text:wText.trim(),position:wPos,priority:wPri,createdAt:new Date().toISOString(),resolved:false});state.addingWorkOn=false;saveState();render();}
+    addF.appendChild(h("div",{className:"add-row"},
+      h("button",{className:"btn btn-primary btn-sm",style:{flex:1},onClick:doAddW},"Add"),
+      h("button",{className:"btn btn-secondary btn-sm",onClick:()=>{state.addingWorkOn=false;render();}},"Cancel")
+    ));
+    woCard.appendChild(addF);
+  }
+  frag.appendChild(woCard);
+
+  // Belt
+  const bCard = h("div",{className:"card"});
+  bCard.appendChild(h("div",{className:"card-header"},
+    h("div",{className:"card-title"},"Belt Progress"),
+    h("button",{className:"card-action",onClick:()=>{
+      if(state.editingBelt){state.editingBelt=false;}
+      else{state.editingBelt=true;state.beltForm={...state.belt};}
+      render();
+    }}, state.editingBelt?"Cancel":"Edit")
+  ));
+
+  if (state.editingBelt) {
+    const bf = state.beltForm;
+    bCard.appendChild(h("div",{}, h("label",{className:"label"},"Belt"),
+      h("div",{className:"belt-row"}, ...BELTS.map(b=>
+        h("button",{className:`belt-opt ${bf.belt===b.name?"sel":""}`,style:{background:bf.belt===b.name?b.bg:"",color:bf.belt===b.name?(b.name==="White"?"#000":"#fff"):""},onClick:()=>{bf.belt=b.name;bf.stripes=Math.min(bf.stripes,b.stripes);render();}},b.name)
+      ))
+    ));
+    bCard.appendChild(h("div",{className:"field",style:{marginTop:"16px"}}, h("label",{className:"label"},"Stripes"),
+      h("div",{className:"stripe-row"}, ...Array.from({length:beltStripeMax(bf.belt)+1}).map((_,i)=>
+        h("button",{className:`stripe-btn ${bf.stripes===i?"sel":""}`,onClick:()=>{bf.stripes=i;render();}},String(i))
+      ))
+    ));
+    bCard.appendChild(h("div",{className:"field"}, h("label",{className:"label"},"Training Since"), h("input",{className:"input",type:"date",value:bf.startDate,onInput:ev=>{bf.startDate=ev.target.value;}})));
+    bCard.appendChild(h("div",{className:"field"}, h("label",{className:"label"},"Last Promotion"), h("input",{className:"input",type:"date",value:bf.lastPromo,onInput:ev=>{bf.lastPromo=ev.target.value;}})));
+    bCard.appendChild(h("div",{className:"field"}, h("label",{className:"label"},"Notes"), h("input",{className:"input",value:bf.notes||"",placeholder:"e.g. Got stripe after comp win",onInput:ev=>{bf.notes=ev.target.value;}})));
+    bCard.appendChild(h("button",{className:"btn btn-primary btn-block",style:{marginTop:"16px"},onClick:()=>{state.belt={...bf};state.editingBelt=false;saveState();render();}},"Save"));
+  } else {
+    bCard.appendChild(renderBeltDisplay(state.belt.belt, state.belt.stripes));
+    const meta = h("div",{className:"grid-2",style:{marginTop:"12px"}});
+    if(state.belt.startDate) meta.appendChild(h("div",{}, h("div",{style:{fontSize:"11px",color:"#71717a"}},"Training since"), h("div",{style:{fontSize:"13px",color:"#e4e4e7"}},fmtDate(state.belt.startDate))));
+    if(state.belt.lastPromo) meta.appendChild(h("div",{}, h("div",{style:{fontSize:"11px",color:"#71717a"}},"Last promotion"), h("div",{style:{fontSize:"13px",color:"#e4e4e7"}},fmtDate(state.belt.lastPromo))));
+    bCard.appendChild(meta);
+    if(state.belt.startDate){
+      const months=Math.floor((Date.now()-new Date(state.belt.startDate))/(864e5*30.44));
+      const y=Math.floor(months/12),m=months%12;
+      bCard.appendChild(h("div",{style:{marginTop:"12px"}}, h("div",{style:{fontSize:"11px",color:"#71717a"}},"Time on mats"), h("div",{style:{fontSize:"13px",color:"#f59e0b",fontWeight:600}},y>0?y+"y "+m+"m":m+" months")));
+    }
+    if(state.belt.notes) bCard.appendChild(h("p",{style:{marginTop:"8px",fontSize:"12px",color:"#71717a",fontStyle:"italic"}},state.belt.notes));
+  }
+  frag.appendChild(bCard);
+
+  return frag;
+}
+
+function renderStats() {
+  const card = h("div",{className:"card"});
+  if(state.entries.length===0){card.appendChild(h("p",{style:{fontSize:"13px",color:"#52525b",textAlign:"center",padding:"40px 0"}},"Log some sessions to see stats."));return card;}
+
+  const tot=state.entries.length;
+  const rolls=state.entries.reduce((a,e)=>a+e.rolls.length,0);
+  const techs=state.entries.reduce((a,e)=>a+e.techniques.length,0);
+  const avgE=(state.entries.reduce((a,e)=>a+e.energy,0)/tot).toFixed(1);
+
+  card.appendChild(h("div",{className:"card-title",style:{marginBottom:"16px"}},"Overview"));
+  card.appendChild(h("div",{className:"stats-grid"},
+    h("div",{},h("div",{className:"stat-num"},String(tot)),h("div",{className:"stat-label"},"Sessions")),
+    h("div",{},h("div",{className:"stat-num"},String(rolls)),h("div",{className:"stat-label"},"Rolls")),
+    h("div",{},h("div",{className:"stat-num"},String(techs)),h("div",{className:"stat-label"},"Techniques")),
+    h("div",{},h("div",{className:"stat-num accent"},avgE),h("div",{className:"stat-label"},"Avg energy"))
+  ));
+
+  function countItems(extractFn){const m={};state.entries.forEach(e=>extractFn(e).forEach(v=>{const k=v.toLowerCase();m[k]=(m[k]||0)+1;}));return Object.entries(m).sort((a,b)=>b[1]-a[1]);}
+
+  const topTypes = countItems(e=>e.techniques.map(t=>t.type)).slice(0,4);
+  const topPos = countItems(e=>e.techniques.map(t=>t.position)).slice(0,4);
+  const topPartners = countItems(e=>e.rolls.map(r=>r.partner.trim())).slice(0,4);
+
+  if(topTypes.length>0) card.appendChild(h("div",{style:{marginBottom:"16px"}}, h("div",{style:{fontSize:"11px",color:"#71717a",marginBottom:"6px"}},"Most Drilled"),
+    h("div",{className:"stat-tags"}, ...topTypes.map(([t,c])=>tag(t+" ("+c+")","amber")))));
+  if(topPos.length>0) card.appendChild(h("div",{style:{marginBottom:"16px"}}, h("div",{style:{fontSize:"11px",color:"#71717a",marginBottom:"6px"}},"Top Positions"),
+    h("div",{className:"stat-tags"}, ...topPos.map(([p,c])=>tag(p+" ("+c+")","blue")))));
+  if(topPartners.length>0) card.appendChild(h("div",{}, h("div",{style:{fontSize:"11px",color:"#71717a",marginBottom:"6px"}},"Top Partners"),
+    h("div",{className:"stat-tags"}, ...topPartners.map(([n,c])=>tag(n+" ("+c+")","zinc")))));
+
+  return card;
+}
+
+// ── Main Render ──
+function render() {
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+  app.appendChild(renderHeader());
+  const content = h("div",{className:"container",style:{paddingTop:"20px",paddingBottom:"40px"}});
+
+  if (state.showForm) {
+    content.appendChild(renderForm());
+  } else if (state.view === "journal") {
+    content.appendChild(renderJournal());
+  } else if (state.view === "goals") {
+    content.appendChild(renderGoals());
+  } else if (state.view === "stats") {
+    content.appendChild(renderStats());
+  }
+
+  app.appendChild(content);
+}
+
+// ── Init ──
+loadState();
+render();
+
+})();
+</script>
+</body>
+</html>
