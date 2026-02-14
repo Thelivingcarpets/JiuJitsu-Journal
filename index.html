@@ -212,6 +212,9 @@ let state = {
   addingGoal: false,
   addingWorkOn: false,
   expandedEntry: null,
+  tempTech: {name:"",type:"Sweep",position:"Guard",notes:""},
+  tempRoll: {partner:"",result:"Mixed",notes:""},
+  tempWorkOn: {text:"",position:"Guard",priority:"Medium"},
 };
 
 // ── Persistence ──
@@ -338,7 +341,7 @@ function renderHeader() {
     )
   );
 
-  const logBtn = state.showForm ? null : h("button",{className:"btn btn-primary btn-sm",onClick:()=>{state.showForm=true;state.formEntry=freshEntry();state.formTab="details";render();}},
+  const logBtn = state.showForm ? null : h("button",{className:"btn btn-primary btn-sm",onClick:()=>{state.showForm=true;state.formEntry=freshEntry();state.formTab="details";state.tempTech={name:"",type:"Sweep",position:"Guard",notes:""};state.tempRoll={partner:"",result:"Mixed",notes:""};render();}},
     "+ Log"
   );
 
@@ -360,7 +363,7 @@ function renderJournal() {
       h("div",{className:"empty-icon"},"🥋"),
       h("div",{className:"empty-title"},"No sessions logged yet"),
       h("div",{className:"empty-desc"},"Start tracking your training to see patterns and progress"),
-      h("button",{className:"btn btn-primary",onClick:()=>{state.showForm=true;state.formEntry=freshEntry();state.formTab="details";render();}},"Log Your First Session")
+      h("button",{className:"btn btn-primary",onClick:()=>{state.showForm=true;state.formEntry=freshEntry();state.formTab="details";state.tempTech={name:"",type:"Sweep",position:"Guard",notes:""};state.tempRoll={partner:"",result:"Mixed",notes:""};render();}},"Log Your First Session")
     );
   }
   const frag = document.createDocumentFragment();
@@ -473,20 +476,20 @@ function renderForm() {
     });
 
     const addDiv = h("div",{className:"add-form"});
-    let tName="",tType="Sweep",tPos="Guard",tNotes="";
-    const nameInp = h("input",{className:"input",placeholder:"Technique name (e.g. Scissor sweep)",onInput:ev=>{tName=ev.target.value;}});
+    const tt = state.tempTech;
+    const nameInp = h("input",{className:"input",placeholder:"Technique name (e.g. Scissor sweep)",value:tt.name,onInput:ev=>{tt.name=ev.target.value;}});
     nameInp.addEventListener("keydown",ev=>{if(ev.key==="Enter")doAdd();});
     addDiv.appendChild(nameInp);
     addDiv.appendChild(h("div",{className:"grid-2",style:{marginTop:"12px"}},
       h("div",{}, h("label",{className:"label"},"Type"),
-        (() => { const sel = h("select",{className:"input",onInput:ev=>{tType=ev.target.value;}}); TECH_TYPES.forEach(t=>{sel.appendChild(h("option",{value:t},t));}); return sel; })()),
+        (() => { const sel = h("select",{className:"input",onInput:ev=>{tt.type=ev.target.value;}}); TECH_TYPES.forEach(t=>{const o=h("option",{value:t},t);if(t===tt.type)o.selected=true;sel.appendChild(o);}); return sel; })()),
       h("div",{}, h("label",{className:"label"},"Position"),
-        (() => { const sel = h("select",{className:"input",onInput:ev=>{tPos=ev.target.value;}}); POSITIONS.forEach(p=>{sel.appendChild(h("option",{value:p},p));}); return sel; })())
+        (() => { const sel = h("select",{className:"input",onInput:ev=>{tt.position=ev.target.value;}}); POSITIONS.forEach(p=>{const o=h("option",{value:p},p);if(p===tt.position)o.selected=true;sel.appendChild(o);}); return sel; })())
     ));
-    const noteInp = h("input",{className:"input",style:{marginTop:"12px"},placeholder:"Quick note (optional)",onInput:ev=>{tNotes=ev.target.value;}});
+    const noteInp = h("input",{className:"input",style:{marginTop:"12px"},placeholder:"Quick note (optional)",value:tt.notes,onInput:ev=>{tt.notes=ev.target.value;}});
     addDiv.appendChild(noteInp);
 
-    function doAdd(){if(!tName.trim())return;e.techniques.push({id:uid(),name:tName.trim(),type:tType,position:tPos,notes:tNotes});render();}
+    function doAdd(){if(!tt.name.trim())return;e.techniques.push({id:uid(),name:tt.name.trim(),type:tt.type,position:tt.position,notes:tt.notes});state.tempTech={name:"",type:"Sweep",position:"Guard",notes:""};render();}
     addDiv.appendChild(h("button",{className:"btn btn-primary btn-block",style:{marginTop:"12px"},onClick:doAdd},"+ Add Technique"));
     body.appendChild(addDiv);
   }
@@ -501,20 +504,20 @@ function renderForm() {
     });
 
     const addDiv = h("div",{className:"add-form"});
-    let rPartner="",rResult="Mixed",rNotes="";
-    const pInp = h("input",{className:"input",placeholder:"Training partner name",onInput:ev=>{rPartner=ev.target.value;}});
+    const tr = state.tempRoll;
+    const pInp = h("input",{className:"input",placeholder:"Training partner name",value:tr.partner,onInput:ev=>{tr.partner=ev.target.value;}});
     pInp.addEventListener("keydown",ev=>{if(ev.key==="Enter")doAddR();});
     addDiv.appendChild(pInp);
     addDiv.appendChild(h("div",{style:{marginTop:"12px"}}, h("label",{className:"label"},"How did it go?"),
       h("div",{className:"grid-3"}, ...RESULTS.map(r => {
-        const cls = rResult===r ? (r==="Dominant"||r==="Subbed them"?"active-green":r==="Got subbed"||r==="Got smashed"?"active-red":"active-white") : "";
-        return h("button",{className:`toggle-btn ${cls}`,onClick:()=>{rResult=r;render();}},r);
+        const cls = tr.result===r ? (r==="Dominant"||r==="Subbed them"?"active-green":r==="Got subbed"||r==="Got smashed"?"active-red":"active-white") : "";
+        return h("button",{className:`toggle-btn ${cls}`,onClick:()=>{tr.result=r;render();}},r);
       }))
     ));
-    const nInp = h("input",{className:"input",style:{marginTop:"12px"},placeholder:"What worked / caught you?",onInput:ev=>{rNotes=ev.target.value;}});
+    const nInp = h("input",{className:"input",style:{marginTop:"12px"},placeholder:"What worked / caught you?",value:tr.notes,onInput:ev=>{tr.notes=ev.target.value;}});
     addDiv.appendChild(nInp);
 
-    function doAddR(){if(!rPartner.trim())return;e.rolls.push({id:uid(),partner:rPartner.trim(),result:rResult,notes:rNotes});render();}
+    function doAddR(){if(!tr.partner.trim())return;e.rolls.push({id:uid(),partner:tr.partner.trim(),result:tr.result,notes:tr.notes});state.tempRoll={partner:"",result:"Mixed",notes:""};render();}
     addDiv.appendChild(h("button",{className:"btn btn-primary btn-block",style:{marginTop:"12px"},onClick:doAddR},"+ Add Roll"));
     body.appendChild(addDiv);
   }
@@ -622,24 +625,24 @@ function renderGoals() {
   }
 
   if (state.addingWorkOn) {
-    let wText="",wPos="Guard",wPri="Medium";
+    const tw = state.tempWorkOn;
     const addF = h("div",{className:"add-form"});
-    const tInp = h("input",{className:"input",placeholder:"e.g. Getting stuck in bottom side control",onInput:ev=>{wText=ev.target.value;},autofocus:"true"});
+    const tInp = h("input",{className:"input",placeholder:"e.g. Getting stuck in bottom side control",value:tw.text,onInput:ev=>{tw.text=ev.target.value;},autofocus:"true"});
     tInp.addEventListener("keydown",ev=>{if(ev.key==="Enter")doAddW();});
     addF.appendChild(tInp);
     addF.appendChild(h("div",{className:"grid-2",style:{marginTop:"12px"}},
       h("div",{}, h("label",{className:"label"},"Position"),
-        (()=>{const s=h("select",{className:"input",onInput:ev=>{wPos=ev.target.value;}});POSITIONS.forEach(p=>{s.appendChild(h("option",{value:p},p));});return s;})()),
+        (()=>{const s=h("select",{className:"input",onInput:ev=>{tw.position=ev.target.value;}});POSITIONS.forEach(p=>{const o=h("option",{value:p},p);if(p===tw.position)o.selected=true;s.appendChild(o);});return s;})()),
       h("div",{}, h("label",{className:"label"},"Priority"),
         h("div",{className:"toggle-row",style:{gap:"4px"}},
-          ...["High","Medium","Low"].map(p=>h("button",{className:`toggle-btn ${wPri===p?(p==="High"?"active-red":p==="Medium"?"active":""):""}`,style:{fontSize:"11px"},onClick:()=>{wPri=p;render();}},p))
+          ...["High","Medium","Low"].map(p=>h("button",{className:`toggle-btn ${tw.priority===p?(p==="High"?"active-red":p==="Medium"?"active":""):""}`,style:{fontSize:"11px"},onClick:()=>{tw.priority=p;render();}},p))
         ))
     ));
 
-    function doAddW(){if(!wText.trim())return;state.workOn.push({id:uid(),text:wText.trim(),position:wPos,priority:wPri,createdAt:new Date().toISOString(),resolved:false});state.addingWorkOn=false;saveState();render();}
+    function doAddW(){if(!tw.text.trim())return;state.workOn.push({id:uid(),text:tw.text.trim(),position:tw.position,priority:tw.priority,createdAt:new Date().toISOString(),resolved:false});state.addingWorkOn=false;state.tempWorkOn={text:"",position:"Guard",priority:"Medium"};saveState();render();}
     addF.appendChild(h("div",{className:"add-row"},
       h("button",{className:"btn btn-primary btn-sm",style:{flex:1},onClick:doAddW},"Add"),
-      h("button",{className:"btn btn-secondary btn-sm",onClick:()=>{state.addingWorkOn=false;render();}},"Cancel")
+      h("button",{className:"btn btn-secondary btn-sm",onClick:()=>{state.addingWorkOn=false;state.tempWorkOn={text:"",position:"Guard",priority:"Medium"};render();}},"Cancel")
     ));
     woCard.appendChild(addF);
   }
